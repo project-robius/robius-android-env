@@ -1,6 +1,6 @@
 use std::sync::OnceLock;
 
-use jni::{objects::JObject, JavaVM};
+pub use jni::{objects::JObject, JavaVM};
 
 static VM: OnceLock<JavaVM> = OnceLock::new();
 
