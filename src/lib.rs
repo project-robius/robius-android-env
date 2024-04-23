@@ -1,6 +1,6 @@
 use std::sync::OnceLock;
 
-pub use jni::{objects::JObject, JNIEnv, JavaVM};
+use jni::{objects::JObject, sys, JNIEnv, JavaVM};
 
 static VM: OnceLock<JavaVM> = OnceLock::new();
 
@@ -12,14 +12,14 @@ pub fn set_vm(vm: JavaVM) -> Result<(), JavaVM> {
 
 // NOTE: These lifetimes are wrong, but that's fine because we don't expose them
 // to the user.
-static ACTIVITY_GETTER: OnceLock<fn() -> (Option<JNIEnv<'static>>, &'static JObject<'static>)> =
+static ACTIVITY_GETTER: OnceLock<fn() -> (Option<*mut sys::JNIEnv>, sys::jobject)> =
     OnceLock::new();
 
 #[inline]
 #[cfg(feature = "set")]
 pub fn set_current_activity_getter(
-    f: fn() -> (Option<JNIEnv<'static>>, &'static JObject<'static>),
-) -> Result<(), fn() -> (Option<JNIEnv<'static>>, &'static JObject<'static>)> {
+    f: fn() -> (Option<*mut sys::JNIEnv>, sys::jobject),
+) -> Result<(), fn() -> (Option<*mut sys::JNIEnv>, sys::jobject)> {
     ACTIVITY_GETTER.set(f)
 }
 
@@ -29,6 +29,9 @@ where
 {
     let getter = ACTIVITY_GETTER.get()?;
     let (maybe_env, object) = getter();
-    let mut env = maybe_env.or_else(|| VM.get()?.get_env().ok())?;
-    Some(f(&mut env, object))
+    let object = unsafe { JObject::from_raw(object) };
+    let mut env = maybe_env
+        .and_then(|raw| unsafe { JNIEnv::from_raw(raw) }.ok())
+        .or_else(|| VM.get()?.get_env().ok())?;
+    Some(f(&mut env, &object))
 }
