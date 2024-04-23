@@ -43,9 +43,13 @@ static ACTIVITY_GETTER: OnceLock<ActivityGetterFn> = OnceLock::new();
 
 /// Registers the function that retrieves pointers to the
 /// current JNI environment (optional) and the current Android Activity (as a jobect).
+///
+/// ## Safety
+/// The caller must ensure that the provided function `f` provides correct pointers
+/// to the current JNI environment (if used) and the current Android Activity.
 #[inline]
 #[cfg(feature = "set")]
-pub fn set_activity_getter(f: ActivityGetterFn) -> Result<(), ActivityGetterFn> {
+pub unsafe fn set_activity_getter(f: ActivityGetterFn) -> Result<(), ActivityGetterFn> {
     ACTIVITY_GETTER.set(f)
 }
 
@@ -62,8 +66,10 @@ where
 {
     let getter = ACTIVITY_GETTER.get()?;
     let (jni_env_opt, activity) = getter();
+    // SAFETY: we have no option but to trust the pointers received from the getter fn.
     let activity = unsafe { JObject::from_raw(activity) };
     let mut env = jni_env_opt
+        // SAFETY: we have no option but to trust the pointers received from the getter fn.
         .and_then(|raw| unsafe { JNIEnv::from_raw(raw) }.ok())
         .or_else(|| VM.get()?.get_env().ok())?;
     Some(f(&mut env, &activity))
