@@ -1,8 +1,16 @@
 //! Abstractions for Rust access to Android state (native Java objects) managed by UI toolkits.
 //!
 //! The states of interest are:
-//! * a reference to the current Android activity
-//! * a reference to the current Java VM instance (and JNI environment)
+//! * a reference to the current Android activity.
+//! * a reference to the current Java VM instance (and JNI environment).
+//!
+//! This crate exists for two kinds of downstream users:
+//! 1. The UI toolkit that exposes its key internal states that hold
+//!    the current Android activity being displayed and the Java VM / JNI environment.
+//!    Either the UI toolkit or the app itself should set these states on startup,
+//!    specifically using [`set_vm`] and [`set_activity_getter`] functions.
+//! 2. The Rust platform feature crates that need to access the current activity
+//!    and JNI environment in order to interact with the Android platform.
 //!
 
 use std::sync::OnceLock;
@@ -37,7 +45,7 @@ static ACTIVITY_GETTER: OnceLock<ActivityGetterFn> = OnceLock::new();
 /// current JNI environment (optional) and the current Android Activity (as a jobect).
 #[inline]
 #[cfg(feature = "set")]
-pub fn set_current_activity_getter(f: ActivityGetterFn) -> Result<(), ActivityGetterFn> {
+pub fn set_activity_getter(f: ActivityGetterFn) -> Result<(), ActivityGetterFn> {
     ACTIVITY_GETTER.set(f)
 }
 
