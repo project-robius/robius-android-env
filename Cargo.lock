@@ -59,6 +59,21 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "90ed8c1e510134f979dbc4f070f87d4313098b704861a105fe34231c70a3901c"
 
 [[package]]
+name = "makepad-android-state"
+version = "0.1.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "dd004cda8be459fd76954218b76a1249a079fb9360bbca4e724cb7ddb2962857"
+dependencies = [
+ "makepad-jni-sys",
+]
+
+[[package]]
+name = "makepad-jni-sys"
+version = "0.4.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "9775cbec5fa0647500c3e5de7c850280a88335d1d2d770e5aa2332b801ba7064"
+
+[[package]]
 name = "memchr"
 version = "2.7.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -87,6 +102,7 @@ name = "robius-android-env"
 version = "0.1.0"
 dependencies = [
  "jni",
+ "makepad-android-state",
 ]
 
 [[package]]

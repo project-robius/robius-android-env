@@ -1,9 +1,7 @@
-//! Abstractions for Rust access to Android state (native Java objects) managed by UI toolkits.
+//! Abstractions for Rust access to Android state (native Java objects)
+//! managed by UI toolkits.
 //!
-//! The states of interest are:
-//! * a reference to the current Android activity.
-//! * a reference to the current Java VM instance (and JNI environment).
-//!
+//! # Usage of this crate
 //! This crate exists for two kinds of downstream users:
 //! 1. The UI toolkit that exposes its key internal states that hold
 //!    the current Android activity being displayed and the Java VM / JNI environment.
@@ -12,6 +10,26 @@
 //! 2. The Rust platform feature crates that need to access the current activity
 //!    and JNI environment in order to interact with the Android platform.
 //!
+//! ## Supported UI toolkits
+//! * Makepad: enable the `makepad` Cargo feature.
+//! * Others coming soon! (in the meantime, see below)
+//!
+//! ## Usage of this crate for other UI toolkits
+//! For any other UI toolkits not listed above, your application code must
+//! manually provide two key states:
+//! * a reference to the current Android activity.
+//! * a reference to the current Java VM instance (and JNI environment).
+//!
+//! This can be achieved by doing the following:
+//! * Enable the `set` Cargo feature, and
+//! * Provide an [ActivityGetterFn] callback by calling [`set_activity_getter()`].
+//! * If the [ActivityGetterFn] cannot provide a [`JNIEnv`] object,
+//!   the application must also call the [`set_vm()`] function. 
+//!
+
+#[cfg_attr(feature = "makepad", path = "makepad.rs")]
+#[cfg_attr(not(feature = "makepad"), path = "custom.rs")]
+mod inner;
 
 use std::sync::OnceLock;
 
@@ -24,11 +42,11 @@ pub mod sys {
 }
 
 /// The Java VM instance.
+#[allow(dead_code)]
 static VM: OnceLock<JavaVM> = OnceLock::new();
 
 /// Sets the current Java VM.
 #[inline]
-#[cfg(feature = "set")]
 pub fn set_vm(vm: JavaVM) -> Result<(), JavaVM> {
     VM.set(vm)
 }
@@ -39,6 +57,7 @@ pub type ActivityGetterFn = fn() -> (Option<*mut sys::JNIEnv>, sys::jobject);
 
 /// The function registered by the UI toolkit that provides raw pointers
 /// to the current Android Activity object and JNI environment.
+#[allow(dead_code)]
 static ACTIVITY_GETTER: OnceLock<ActivityGetterFn> = OnceLock::new();
 
 /// Registers the function that retrieves pointers to the
@@ -48,12 +67,11 @@ static ACTIVITY_GETTER: OnceLock<ActivityGetterFn> = OnceLock::new();
 /// The caller must ensure that the provided function `f` provides correct pointers
 /// to the current JNI environment (if used) and the current Android Activity.
 #[inline]
-#[cfg(feature = "set")]
 pub unsafe fn set_activity_getter(f: ActivityGetterFn) -> Result<(), ActivityGetterFn> {
     ACTIVITY_GETTER.set(f)
 }
 
-/// Invokes the given closure `f` with a reference to the current JNI environment
+/// Invokes the given closure `f` with the current JNI environment
 /// and the current activity.
 ///
 /// Returns `None` upon error, including:
@@ -64,13 +82,5 @@ pub fn with_activity<F, R>(f: F) -> Option<R>
 where
     F: for<'a, 'b, 'c, 'd> Fn(&'a mut JNIEnv<'b>, &'c JObject<'d>) -> R,
 {
-    let getter = ACTIVITY_GETTER.get()?;
-    let (jni_env_opt, activity) = getter();
-    // SAFETY: we have no option but to trust the pointers received from the getter fn.
-    let activity = unsafe { JObject::from_raw(activity) };
-    let mut env = jni_env_opt
-        // SAFETY: we have no option but to trust the pointers received from the getter fn.
-        .and_then(|raw| unsafe { JNIEnv::from_raw(raw) }.ok())
-        .or_else(|| VM.get()?.get_env().ok())?;
-    Some(f(&mut env, &activity))
+    inner::with_activity_inner(f)
 }
