@@ -10,6 +10,7 @@ description = "Rust access to Android state (native Java objects) managed by UI 
 documentation = "https://docs.rs/robius-android-env"
 homepage = "https://robius.rs/"
 keywords = ["robius", "android", "environment", "java", "jvm", "jni"]
+categories = ["gui", "os", "os::android-apis"]
 license = "MIT"
 readme = "README.md"
 repository = "https://github.com/project-robius/robius-android-env"
