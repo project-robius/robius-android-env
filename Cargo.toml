@@ -2,6 +2,17 @@
 name = "robius-android-env"
 version = "0.1.0"
 edition = "2021"
+authors = [
+    "Kevin Boos <kevinaboos@gmail.com>",
+    "Project Robius Maintainers",
+]
+description = "Rust access to Android state (native Java objects) managed by UI toolkits"
+documentation = "https://docs.rs/robius-android-env"
+homepage = "https://robius.rs/"
+keywords = ["robius", "android", "environment", "java", "jvm", "jni"]
+license = "MIT"
+readme = "README.md"
+repository = "https://github.com/project-robius/robius-android-env"
 
 [dependencies]
 jni = "0.21.1"
