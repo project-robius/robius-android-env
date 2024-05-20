@@ -24,7 +24,6 @@ Instead, your application code must manually provide two key states:
 * a reference to the current Java VM instance (and JNI environment).
 
 This can be achieved by doing the following:
-* Enable the `set` Cargo feature, and
 * Provide an [ActivityGetterFn] callback by calling [`set_activity_getter()`].
 * If the [ActivityGetterFn] cannot provide a low-level [`JNIEnv`] object,
 the application must also call the [`set_vm()`] function. 
