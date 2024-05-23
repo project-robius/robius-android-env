@@ -1,5 +1,7 @@
 # `robius-android-env`
 
+[![Latest Version](https://img.shields.io/crates/v/robius-android-env.svg)](https://crates.io/crates/robius-android-env)
+[![Docs](https://docs.rs/robius-android-env/badge.svg)](https://docs.rs/robius-android-env/latest/robius_android_env/)
 [![Project Robius Matrix Chat](https://img.shields.io/matrix/robius-general%3Amatrix.org?server_fqdn=matrix.org&style=flat&logo=matrix&label=Project%20Robius%20Matrix%20Chat&color=B7410E)](https://matrix.to/#/#robius:matrix.org)
 
 This crate provides easy Rust access to Android state (native Java objects) managed by UI toolkits.
