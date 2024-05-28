@@ -6,16 +6,20 @@
 //! 1. The UI toolkit that exposes its key internal states that hold
 //!    the current Android activity being displayed and the Java VM / JNI environment.
 //!    Either the UI toolkit or the app itself should set these states on startup,
-//!    specifically using [`set_vm`] and [`set_activity_getter`] functions.
-//! 2. The Rust platform feature crates that need to access the current activity
-//!    and JNI environment in order to interact with the Android platform.
+//!    either by using [ndk-context] or by manually calling the [`set_vm`]
+//!    and [`set_activity_getter`] functions.
+//! 2. The platform feature "middleware" crates that need to access the current activity
+//!    and JNI environment from Rust code in order to interact with the Android platform.
 //!
 //! ## Supported UI toolkits
 //! * Makepad: enable the `makepad` Cargo feature.
+//! * UI toolkits compatible with [ndk-context]: enable the `ndk_context` Cargo feature.
 //! * Others coming soon! (in the meantime, see below)
 //!
 //! ## Usage of this crate for other UI toolkits
-//! For any other UI toolkits not listed above, you don't need to enable any cargo features.
+//! ⚠️ **Note: for wider compatibility, you should prefer the `ndk-context` feature instead of what is described below.**
+//!
+//! For any other UI toolkits not mentioned above, you don't need to enable any cargo features.
 //! Instead, your application code must manually provide two key states:
 //! * a reference to the current Android activity.
 //! * a reference to the current Java VM instance (and JNI environment).
@@ -26,9 +30,11 @@
 //! * If the [ActivityGetterFn] cannot provide a low-level [`JNIEnv`] object,
 //!   the application must also call the [`set_vm()`] function. 
 //!
+//! [ndk-context]: https://docs.rs/ndk-context/latest/ndk_context/
 
 #[cfg_attr(feature = "makepad", path = "makepad.rs")]
-#[cfg_attr(not(feature = "makepad"), path = "custom.rs")]
+#[cfg_attr(feature = "ndk_context", path = "ndk_context.rs")]
+#[cfg_attr(not(any(feature = "makepad", feature = "ndk_context")), path = "custom.rs")]
 mod inner;
 
 use std::sync::OnceLock;

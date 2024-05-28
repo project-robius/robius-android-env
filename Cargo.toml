@@ -18,7 +18,11 @@ repository = "https://github.com/project-robius/robius-android-env"
 [dependencies]
 jni = "0.21.1"
 makepad-android-state = { version = "0.1.0", optional = true }
+ndk-context = {version = "0.1.0", optional = true }
 
 [features]
 ## Set this feature when building a Makepad app.
 makepad = ["dep:makepad-android-state"]
+## Set this feature when using this crate from an app that uses `ndk-context`,
+## e.g., any app using `android-activity` or `ndk-glue`.
+ndk_context = ["dep:ndk-context"]
