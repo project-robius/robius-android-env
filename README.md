@@ -11,7 +11,7 @@ This crate exists for two kinds of downstream users:
 1. The UI toolkit that exposes its key internal states that hold
    the current Android activity being displayed and the Java VM / JNI environment.
    Either the UI toolkit or the app itself should set these states on startup,
-   either by using [ndk-context] or by manually calling the [`set_vm`] and [`set_activity_getter`] functions.
+   either by using [ndk-context] or by manually calling the [`set_vm()`] and [`set_activity_getter()`] functions.
 2. The platform feature "middleware" crates that need to access the current activity
    and JNI environment from Rust code in order to interact with the Android platform.
 

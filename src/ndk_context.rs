@@ -1,7 +1,7 @@
 //! The implementation for UI toolkits that work with [ndk-context].
 //!
 //! This module works by accessing the [`AndroidContext`] state stored in [ndk-context],
-//! which must be initialized by other crates (e.g., `android-activity`, `ndk-glue`)
+//! which must be initialized by other crates (e.g., `android-activity`).
 //! before this module uses those states.
 //!
 //! [ndk-context]: https://docs.rs/ndk-context/latest/ndk_context/
