@@ -86,7 +86,7 @@ pub unsafe fn set_activity_getter(f: ActivityGetterFn) -> Result<(), ActivityGet
 /// * If the current JNI environment cannot be obtained.
 pub fn with_activity<F, R>(f: F) -> Option<R>
 where
-    F: for<'a, 'b, 'c, 'd> Fn(&'a mut JNIEnv<'b>, &'c JObject<'d>) -> R,
+    F: for<'a, 'b, 'c, 'd> FnOnce(&'a mut JNIEnv<'b>, &'c JObject<'d>) -> R,
 {
     inner::with_activity_inner(f)
 }
