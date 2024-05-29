@@ -5,7 +5,7 @@ use crate::{VM, ACTIVITY_GETTER, JNIEnv, JObject};
 
 pub fn with_activity_inner<F, R>(f: F) -> Option<R>
 where
-    F: for<'a, 'b, 'c, 'd> Fn(&'a mut JNIEnv<'b>, &'c JObject<'d>) -> R,
+    F: for<'a, 'b, 'c, 'd> FnOnce(&'a mut JNIEnv<'b>, &'c JObject<'d>) -> R,
 {
     let getter = ACTIVITY_GETTER.get()?;
     let (jni_env_opt, activity) = getter();
