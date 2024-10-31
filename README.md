@@ -6,35 +6,26 @@
 
 This crate provides easy Rust access to Android state (native Java objects) managed by UI toolkits.
 
-## Usage of this crate
+# Usage of this crate
 This crate exists for two kinds of downstream users:
 1. The UI toolkit that exposes its key internal states that hold
    the current Android activity being displayed and the Java VM / JNI environment.
    Either the UI toolkit or the app itself should set these states on startup,
-   either by using [ndk-context] or by manually calling the [`set_vm()`] and [`set_activity_getter()`] functions.
+   either by using [ndk-context] or by activating a feature for a specific UI toolkit.
 2. The platform feature "middleware" crates that need to access the current activity
    and JNI environment from Rust code in order to interact with the Android platform.
 
-### Supported UI toolkits
-* Makepad: enable the `makepad` Cargo feature. 
-* UI toolkits compatible with [ndk-context]: enable the `ndk_context` Cargo feature.
+## Supported UI toolkits
+* [Makepad]: enable the `makepad` Cargo feature.
+* UI toolkits compatible with [ndk-context]: supported by default.
 * Others coming soon! (in the meantime, see below)
 
-### Usage of this crate for other UI toolkits
-> ⚠️ Note: for wider compatibility, you should prefer the `ndk-context` feature instead of what is described below.
+## Usage of this crate for other UI toolkits
+For any other UI toolkits that support [ndk-context], you don't need to enable any cargo features.
+However, either your application code or the UI toolkit must manually initialize the Android context
+owned by [ndk-context], i.e., by invoking [`initialize_android_context()`](https://docs.rs/ndk-context/latest/ndk_context/fn.initialize_android_context.html).
+Some UI toolkits automatically do this for you, typically via the [ndk-glue] crate.
 
-For any other UI toolkits not listed above, you don't need to enable any cargo features. 
-Instead, your application code must manually provide two key states:
-* a reference to the current Android activity.
-* a reference to the current Java VM instance (and JNI environment).
-
-This can be achieved by doing the following:
-* Provide an [ActivityGetterFn] callback by calling [`set_activity_getter()`].
-* If the [ActivityGetterFn] cannot provide a low-level [`JNIEnv`] object,
-the application must also call the [`set_vm()`] function. 
-
-[`set_vm()`]: https://docs.rs/robius-android-env/latest/robius_android_env/fn.set_vm.html
-[`set_activity_getter()`]: https://docs.rs/robius-android-env/latest/robius_android_env/fn.set_activity_getter.html
-[ActivityGetterFn]: https://docs.rs/robius-android-env/latest/robius_android_env/type.ActivityGetterFn.html
-[`JNIEnv`]: https://docs.rs/jni/latest/jni/sys/type.JNIEnv.html
+[Makepad]: https://github.com/makepad/makepad/
 [ndk-context]: https://docs.rs/ndk-context/latest/ndk_context/
+[ndk-glue]: https://crates.io/crates/ndk-glue
